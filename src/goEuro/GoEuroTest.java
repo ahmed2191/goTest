@@ -6,10 +6,43 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 public class GoEuroTest {
-
+	public static boolean writeToFile(String path,String data){
+		PrintWriter writer;
+		try {
+			writer = new PrintWriter( path, "UTF-16");
+			writer.println(data);
+	        writer.close();
+		} catch (FileNotFoundException e) {
+			if(path.compareToIgnoreCase("log")!=0){
+				System.out.println("Sorry there were an error while trying to write to the file "+path+ " please make sure this file is not used by any other application and try again. For more information please check the log file");
+				writeToFile("log.txt",e.toString());
+			}else{
+				System.out.println("Sorry cannot write to the log file, please make sure the file is not used by any other application");
+			}
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			if(path.compareToIgnoreCase("log")!=0){
+				//should never happen
+				System.out.println("Sorry there were an error while writing to the file "+path+ " please try again. For more information please check the log file");
+				writeToFile("log.txt",e.toString());
+			}else{
+				//should never happen.
+				System.out.println("Sorry there were a problem when writing to the log file, please try again");
+			}
+		}
+        
+		return true;
+	}
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		String query="Berlin";
+		String query;
+		if(args.length != 0){
+			query=args[0];
+		}else{
+			System.out.println("Please enter a city name to query");
+			return;
+		}
+		
 		if(query.compareToIgnoreCase("")==0){
 			System.out.println("Please enter a city name to query");
 			return;
@@ -47,24 +80,22 @@ public class GoEuroTest {
 		        //note here it wasnt mentioned if the file should append new queries or create new files
 		        //so i found create new files was more relevant. Also it wasnt mentioned if same query done twice
 		        //should it create new files or overwrite so i picked overwrite. 
-		        PrintWriter writer = new PrintWriter(query+".csv", "UTF-16");
-		        writer.println(entry);
-		        writer.close();
+		        writeToFile(query+".csv", entry);
 	        }
         }
         in.close();
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
-			System.out.println("Sorry there were a mistake in the URL please try again for more infromation check the following trace:");
-			e.printStackTrace();
+			System.out.println("Sorry there were a mistake in the URL please try again, for more infromation check the log file");
+			writeToFile("log.txt",e.toString());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("Sorry there were a mistake in the URL please try again for more infromation check the following trace:");
-			e.printStackTrace();
+			System.out.println("Sorry there were a mistake try again, for more infromation check the log file");
+			writeToFile("log.txt",e.toString());
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
-			System.out.println("Sorry there were a mistake in the recived data (JSOB object) please try again for more infromation check the following trace:");
-			e.printStackTrace();
+			System.out.println("Sorry there were a mistake in the recived data (JSON object) please try again, for more infromation check the log file");
+			writeToFile("log.txt",e.toString());
 		}
     }
 
